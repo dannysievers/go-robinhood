@@ -103,12 +103,17 @@ func (p *Pager) GetNext(ctx context.Context, c *Client, out interface{}) error {
 // provided context is cancelled. This is done to mimic the way the web UI
 // fetches many, many options instruments repeatedly, since I haven't yet
 // figured out how/when they decide to stop.
-func (o *OptionChain) GetInstrument(ctx context.Context, tradeType string, date Date) ([]*OptionInstrument, error) {
+func (o *OptionChain) GetInstrument(ctx context.Context, tradeType string, dates ...Date) ([]*OptionInstrument, error) {
+	strDates := []string{}
+	for _, date := range dates {
+		strDates = append(strDates, date.String())
+	}
+
 	u := fmt.Sprintf(
 		"%sinstruments/?chain_id=%s&expiration_dates=%s&state=active&tradability=tradable&type=%s",
 		EPOptions,
 		o.ID,
-		date,
+		strings.Join(strDates, ","),
 		tradeType,
 	)
 
